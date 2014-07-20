@@ -438,34 +438,36 @@ public:
     }
 };
 
-class Dealer {
-private:
-    Hand dealerHand;
+class GenericPlayer {
+protected:
+    Hand genericPlayerHand;
 
 public:
+    virtual ~GenericPlayer() {
+    }
+
     int getHandValue() {
-        return dealerHand.getHandValue();
+        return genericPlayerHand.getHandValue();
     }
 
     std::string getHandInTextFormat() {
-        return dealerHand.getHandInTextFormat();
+        return genericPlayerHand.getHandInTextFormat();
     }
 
-    bool handValueIsAtLeast17() {
-        int dealerHandValue = getHandValue();
-        if (dealerHandValue >= 17) {
+    void isHitting(Card* newCard) {
+        genericPlayerHand.addCardToHand(newCard);
+    }
+
+    bool isBusted() {
+        if (genericPlayerHand.getHandValue() > 21) {
             return true;
         } else {
             return false;
         }
     }
 
-    void isHitting(Card* newCard) {
-        dealerHand.addCardToHand(newCard);
-    }
-
-    bool isBusted() {
-        if (dealerHand.getHandValue() > 21) {
+    bool hasBlackjack() {
+        if (genericPlayerHand.getHandValue() == 21) {
             return true;
         } else {
             return false;
@@ -474,13 +476,24 @@ public:
 
     // The cards in hand are discarded.
     void clearHand() {
-        dealerHand.clearHand();
+        genericPlayerHand.clearHand();
     }
 };
 
-class Player {
+class Dealer: public GenericPlayer {
+public:
+    bool handValueIsAtLeast17() {
+        int dealerHandValue = getHandValue();
+        if (dealerHandValue >= 17) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+};
+
+class Player: public GenericPlayer {
 private:
-    Hand playerHand;
     int chipsToPlay;
     int chipsInBettingBox;
     static const int minimumBet = 1; // The player should bet at least 1 chip.
@@ -490,14 +503,6 @@ public:
         chipsToPlay = 0;
         buyChips(100); // The player starts with 100 chips.
         chipsInBettingBox = 0;
-    }
-
-    int getHandValue() {
-        return playerHand.getHandValue();
-    }
-
-    std::string getHandInTextFormat() {
-        return playerHand.getHandInTextFormat();
     }
 
     void buyChips(int newChips) {
@@ -531,26 +536,6 @@ public:
         return minimumBet;
     }
 
-    void isHitting(Card* newCard) {
-        playerHand.addCardToHand(newCard);
-    }
-
-    bool isBusted() {
-        if (playerHand.getHandValue() > 21) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    bool hasBlackjack() {
-        if (playerHand.getHandValue() == 21) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     void wins() {
         int chipsWon = chipsInBettingBox; // All wins are paid out at 1:1.
         chipsToPlay += chipsInBettingBox + chipsWon;
@@ -564,11 +549,6 @@ public:
 
     void loses() {
         chipsInBettingBox = 0; // Bet is lost (i.e., taken by the dealer).
-    }
-
-    // The cards in hand are discarded.
-    void clearHand() {
-        playerHand.clearHand();
     }
 };
 
