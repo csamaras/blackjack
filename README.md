@@ -3,7 +3,8 @@ blackjack
 
 A text-based Blackjack game.
 
-Rules and assumptions:
+## Rules and assumptions
+
 - There is 1 dealer.
 - There is only 1 player.
 - The dealing shoe contains 1 standard 52-card deck.
